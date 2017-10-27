@@ -52,6 +52,19 @@ func (kg *aesKeyGenerator) KeyGen(opts bccsp.KeyGenOpts) (k bccsp.Key, err error
 	return &aesPrivateKey{lowLevelKey, false}, nil
 }
 
+type sm4KeyGenerator struct {
+	length int
+}
+
+func (kg *sm4KeyGenerator) KeyGen(opts bccsp.KeyGenOpts) (k bccsp.Key, err error) {
+	lowLevelKey, err := GetRandomBytes(int(kg.length))
+	if err != nil {
+		return nil, fmt.Errorf("Failed generating SM4 %d key [%s]", kg.length, err)
+	}
+
+	return &sm4PrivateKey{lowLevelKey, false}, nil
+}
+
 type rsaKeyGenerator struct {
 	length int
 }

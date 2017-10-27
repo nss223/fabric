@@ -294,6 +294,58 @@ func AEStoEncryptedPEM(raw []byte, pwd []byte) ([]byte, error) {
 	return pem.EncodeToMemory(block), nil
 }
 
+// PEMtoSM4 extracts from the PEM an SM4 key
+func PEMtoSM4(raw []byte, pwd []byte) ([]byte, error) {
+	if len(raw) == 0 {
+		return nil, errors.New("Invalid PEM. It must be different from nil.")
+	}
+	block, _ := pem.Decode(raw)
+	if block == nil {
+		return nil, fmt.Errorf("Failed decoding PEM. Block must be different from nil. [% x]", raw)
+	}
+
+	if x509.IsEncryptedPEMBlock(block) {
+		if len(pwd) == 0 {
+			return nil, errors.New("Encrypted Key. Password must be different fom nil")
+		}
+
+		decrypted, err := x509.DecryptPEMBlock(block, pwd)
+		if err != nil {
+			return nil, fmt.Errorf("Failed PEM decryption. [%s]", err)
+		}
+		return decrypted, nil
+	}
+
+	return block.Bytes, nil
+}
+
+// SM4toPEM encapsulates an SM4 key in the PEM format
+func SM4toPEM(raw []byte) []byte {
+	return pem.EncodeToMemory(&pem.Block{Type: "SM4 PRIVATE KEY", Bytes: raw})
+}
+
+// SM4toEncryptedPEM encapsulates an SM4 key in the encrypted PEM format
+func SM4toEncryptedPEM(raw []byte, pwd []byte) ([]byte, error) {
+	if len(raw) == 0 {
+		return nil, errors.New("Invalid sm4 key. It must be different from nil")
+	}
+	if len(pwd) == 0 {
+		return SM4toPEM(raw), nil
+	}
+
+	block, err := x509.EncryptPEMBlock(
+		rand.Reader,
+		"SM4 PRIVATE KEY",
+		raw,
+		pwd,
+		x509.PEMCipherAES256)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return pem.EncodeToMemory(block), nil
+}
 // PublicKeyToPEM marshals a public key to the pem format
 func PublicKeyToPEM(publicKey interface{}, pwd []byte) ([]byte, error) {
 	if len(pwd) != 0 {

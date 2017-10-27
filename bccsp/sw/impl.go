@@ -67,10 +67,12 @@ func New(securityLevel int, hashFamily string, keyStore bccsp.KeyStore) (bccsp.B
 	// Set the encryptors
 	encryptors := make(map[reflect.Type]Encryptor)
 	encryptors[reflect.TypeOf(&aesPrivateKey{})] = &aescbcpkcs7Encryptor{}
+	encryptors[reflect.TypeOf(&sm4PrivateKey{})] = &sm4cbcpkcs7Encryptor{}
 
 	// Set the decryptors
 	decryptors := make(map[reflect.Type]Decryptor)
 	decryptors[reflect.TypeOf(&aesPrivateKey{})] = &aescbcpkcs7Decryptor{}
+	decryptors[reflect.TypeOf(&sm4PrivateKey{})] = &sm4cbcpkcs7Decryptor{}
 
 	// Set the signers
 	signers := make(map[reflect.Type]Signer)
@@ -107,6 +109,7 @@ func New(securityLevel int, hashFamily string, keyStore bccsp.KeyStore) (bccsp.B
 	keyGenerators[reflect.TypeOf(&bccsp.ECDSAP256KeyGenOpts{})] = &ecdsaKeyGenerator{curve: elliptic.P256()}
 	keyGenerators[reflect.TypeOf(&bccsp.ECDSAP384KeyGenOpts{})] = &ecdsaKeyGenerator{curve: elliptic.P384()}
 	keyGenerators[reflect.TypeOf(&bccsp.AESKeyGenOpts{})] = &aesKeyGenerator{length: conf.aesBitLength}
+	keyGenerators[reflect.TypeOf(&bccsp.SM4KeyGenOpts{})] = &sm4KeyGenerator{length: 16}
 	keyGenerators[reflect.TypeOf(&bccsp.AES256KeyGenOpts{})] = &aesKeyGenerator{length: 32}
 	keyGenerators[reflect.TypeOf(&bccsp.AES192KeyGenOpts{})] = &aesKeyGenerator{length: 24}
 	keyGenerators[reflect.TypeOf(&bccsp.AES128KeyGenOpts{})] = &aesKeyGenerator{length: 16}
@@ -122,11 +125,13 @@ func New(securityLevel int, hashFamily string, keyStore bccsp.KeyStore) (bccsp.B
 	keyDerivers[reflect.TypeOf(&ecdsaPrivateKey{})] = &ecdsaPrivateKeyKeyDeriver{}
 	keyDerivers[reflect.TypeOf(&ecdsaPublicKey{})] = &ecdsaPublicKeyKeyDeriver{}
 	keyDerivers[reflect.TypeOf(&aesPrivateKey{})] = &aesPrivateKeyKeyDeriver{bccsp: impl}
+	keyDerivers[reflect.TypeOf(&sm4PrivateKey{})] = &sm4PrivateKeyKeyDeriver{bccsp: impl}
 	impl.keyDerivers = keyDerivers
 
 	// Set the key importers
 	keyImporters := make(map[reflect.Type]KeyImporter)
 	keyImporters[reflect.TypeOf(&bccsp.AES256ImportKeyOpts{})] = &aes256ImportKeyOptsKeyImporter{}
+	//keyImporters[reflect.TypeOf(&bccsp.SM4ImportKeyOpts{})] = &sm4ImportKeyOptsKeyImporter{}
 	keyImporters[reflect.TypeOf(&bccsp.HMACImportKeyOpts{})] = &hmacImportKeyOptsKeyImporter{}
 	keyImporters[reflect.TypeOf(&bccsp.ECDSAPKIXPublicKeyImportOpts{})] = &ecdsaPKIXPublicKeyImportOptsKeyImporter{}
 	keyImporters[reflect.TypeOf(&bccsp.ECDSAPrivateKeyImportOpts{})] = &ecdsaPrivateKeyImportOptsKeyImporter{}

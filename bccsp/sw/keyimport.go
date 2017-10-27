@@ -48,6 +48,25 @@ func (*aes256ImportKeyOptsKeyImporter) KeyImport(raw interface{}, opts bccsp.Key
 	return &aesPrivateKey{utils.Clone(aesRaw), false}, nil
 }
 
+type sm4ImportKeyOptsKeyImporter struct{}
+
+func (*sm4ImportKeyOptsKeyImporter) KeyImport(raw interface{}, opts bccsp.KeyImportOpts) (k bccsp.Key, err error) {
+	sm4Raw, ok := raw.([]byte)
+	if !ok {
+		return nil, errors.New("Invalid raw material. Expected byte array.")
+	}
+
+	if sm4Raw == nil {
+		return nil, errors.New("Invalid raw material. It must not be nil.")
+	}
+
+	if len(sm4Raw) != 16 {
+		return nil, fmt.Errorf("Invalid Key Length [%d]. Must be 16 bytes", len(sm4Raw))
+	}
+
+	return &sm4PrivateKey{utils.Clone(sm4Raw), false}, nil
+}
+
 type hmacImportKeyOptsKeyImporter struct{}
 
 func (*hmacImportKeyOptsKeyImporter) KeyImport(raw interface{}, opts bccsp.KeyImportOpts) (k bccsp.Key, err error) {
