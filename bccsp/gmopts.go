@@ -1,9 +1,16 @@
 package bccsp
 
-const {
+const (
+	//国密算法族
+	GM = "GM"
+
+	//国密椭圆曲线签名算法SM2
+	SM2 = "SM2"
+	//国密杂凑函数算法SM3
+	SM3 = "SM3"
 	//国密分组密码算法SM4
 	SM4 = "SM4"
-}
+)
 
 type SM4KeyGenOpts struct {
 	Temporary bool

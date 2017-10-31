@@ -9,7 +9,8 @@ import (
 	"io"
 
 	"github.com/hyperledger/fabric/bccsp"
-	"github.com/hyperledger/fabric/bccsp/gm/sm4"
+	
+	"gm/sm4"
 )
 
 func GetRandomBytessm4(len int) ([]byte, error) {

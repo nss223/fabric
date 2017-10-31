@@ -82,11 +82,6 @@ const (
 
 	// X509Certificate Label for X509 certificate related operation
 	X509Certificate = "X509Certificate"
-
-	//国密椭圆曲线签名算法SM2
-	SM2 = "SM2"
-	//国密杂凑函数算法SM3
-	SM3 = "SM3"
 )
 
 // ECDSAKeyGenOpts contains options for ECDSA key generation.

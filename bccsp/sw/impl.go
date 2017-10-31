@@ -93,6 +93,7 @@ func New(securityLevel int, hashFamily string, keyStore bccsp.KeyStore) (bccsp.B
 	hashers[reflect.TypeOf(&bccsp.SHA384Opts{})] = &hasher{hash: sha512.New384}
 	hashers[reflect.TypeOf(&bccsp.SHA3_256Opts{})] = &hasher{hash: sha3.New256}
 	hashers[reflect.TypeOf(&bccsp.SHA3_384Opts{})] = &hasher{hash: sha3.New384}
+	hashers[reflect.TypeOf(&bccsp.SM3Opts{})] = &hasher{hash: sm3.New}
 
 	impl := &impl{
 		conf:       conf,
@@ -131,7 +132,7 @@ func New(securityLevel int, hashFamily string, keyStore bccsp.KeyStore) (bccsp.B
 	// Set the key importers
 	keyImporters := make(map[reflect.Type]KeyImporter)
 	keyImporters[reflect.TypeOf(&bccsp.AES256ImportKeyOpts{})] = &aes256ImportKeyOptsKeyImporter{}
-	//keyImporters[reflect.TypeOf(&bccsp.SM4ImportKeyOpts{})] = &sm4ImportKeyOptsKeyImporter{}
+	keyImporters[reflect.TypeOf(&bccsp.SM4ImportKeyOpts{})] = &sm4ImportKeyOptsKeyImporter{}
 	keyImporters[reflect.TypeOf(&bccsp.HMACImportKeyOpts{})] = &hmacImportKeyOptsKeyImporter{}
 	keyImporters[reflect.TypeOf(&bccsp.ECDSAPKIXPublicKeyImportOpts{})] = &ecdsaPKIXPublicKeyImportOptsKeyImporter{}
 	keyImporters[reflect.TypeOf(&bccsp.ECDSAPrivateKeyImportOpts{})] = &ecdsaPrivateKeyImportOptsKeyImporter{}

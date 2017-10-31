@@ -23,6 +23,8 @@ import (
 	"hash"
 
 	"golang.org/x/crypto/sha3"
+	"gm/sm3"
+	"gm/sm2"
 )
 
 type config struct {
@@ -30,6 +32,8 @@ type config struct {
 	hashFunction  func() hash.Hash
 	aesBitLength  int
 	rsaBitLength  int
+	sm2BitLength  int
+	sm3BitLength  int
 	sm4BitLength  int
 }
 
@@ -39,6 +43,8 @@ func (conf *config) setSecurityLevel(securityLevel int, hashFamily string) (err 
 		err = conf.setSecurityLevelSHA2(securityLevel)
 	case "SHA3":
 		err = conf.setSecurityLevelSHA3(securityLevel)
+	case "GM":
+		err = conf.setSecurityLevelGM(securityLevel)
 	default:
 		err = fmt.Errorf("Hash Family not supported [%s]", hashFamily)
 	}
@@ -52,12 +58,16 @@ func (conf *config) setSecurityLevelSHA2(level int) (err error) {
 		conf.hashFunction = sha256.New
 		conf.rsaBitLength = 2048
 		conf.aesBitLength = 32
+		conf.sm2BitLength = 32
+		conf.sm3BitLength = 32
 		conf.sm4BitLength = 16
 	case 384:
 		conf.ellipticCurve = elliptic.P384()
 		conf.hashFunction = sha512.New384
 		conf.rsaBitLength = 3072
 		conf.aesBitLength = 32
+		conf.sm2BitLength = 32
+		conf.sm3BitLength = 32
 		conf.sm4BitLength = 16
 	default:
 		err = fmt.Errorf("Security level not supported [%d]", level)
@@ -72,12 +82,40 @@ func (conf *config) setSecurityLevelSHA3(level int) (err error) {
 		conf.hashFunction = sha3.New256
 		conf.rsaBitLength = 2048
 		conf.aesBitLength = 32
+		conf.sm2BitLength = 32
+		conf.sm3BitLength = 32
 		conf.sm4BitLength = 16
 	case 384:
 		conf.ellipticCurve = elliptic.P384()
 		conf.hashFunction = sha3.New384
 		conf.rsaBitLength = 3072
 		conf.aesBitLength = 32
+		conf.sm2BitLength = 32
+		conf.sm3BitLength = 32
+		conf.sm4BitLength = 16
+	default:
+		err = fmt.Errorf("Security level not supported [%d]", level)
+	}
+	return
+}
+
+func (conf *config) setSecurityLevelGM(level int) (err error) {
+	switch level {
+	case 256:
+		conf.ellipticCurve = sm2.P256SM2()
+		conf.hashFunction = sm3.New
+		conf.rsaBitLength = 2048
+		conf.aesBitLength = 32
+		conf.sm2BitLength = 32
+		conf.sm3BitLength = 32
+		conf.sm4BitLength = 16
+	case 384:
+		conf.ellipticCurve = sm2.P256SM2()
+		conf.hashFunction = sm3.New
+		conf.rsaBitLength = 3072
+		conf.aesBitLength = 32
+		conf.sm2BitLength = 32
+		conf.sm3BitLength = 32
 		conf.sm4BitLength = 16
 	default:
 		err = fmt.Errorf("Security level not supported [%d]", level)
